@@ -23,7 +23,7 @@ module.exports.login = function(req, res) {
 	res.render('auth/login');
 };
 
-// signup, render sign up
+// 1.2 signup, render sign up
 module.exports.signup = function(req, res) {
 	res.render('auth/signup');
 };
@@ -231,3 +231,62 @@ module.exports.postActive = function(req, res) {
 
 	
 };
+
+// 3.2 nhận yêu cầu từ router và xử lý các logic cho view
+// post sign up
+module.exports.postSignup = function(req, res) {
+
+	/**
+	 * 1. Nếu email đã tồn tại thì thông báo lỗi
+	 * 2. Nếu email chưa tồn tại
+	 * 	2.1. Gắn cho nó một cái id
+	 *  2.2. Đổi mật khẩu thành md5
+	 *  2.3. Đăng nhập nó
+	 *  2.4. Riderect tới trang chủ
+	 */
+
+	// 3.3 lấy user từ db bằng field email
+	let user = db.get('users').find({email: req.body.email}).value();
+
+	// 3.4 nếu tồn tại user thì render lại trang và hiển thị thông báo lỗi
+	if(user) {
+		res.render('auth/signup', {
+			errors: ['User already exists.'],
+			values: req.body
+		})
+
+		return;
+	}
+
+	// 3.5 nếu không tồn tại user thì 
+	// gán cho nó 1 cái id
+	req.body.id = shortid.generate();
+	// gán 1 cái active = 0
+	req.body.active = 0;
+	// gửi về mail lấy từ form vừa nhập đoạn code id để active tài khoản
+	var mailOptions = {
+		to: req.body.email,
+		subject: 'Code to active account',
+		text: req.body.id
+	};
+	
+	transporter.sendMail(mailOptions, function(error, info){
+		if (error) {
+			console.log(error);
+		} else {
+			console.log('Email sent: ' + info.response);
+		}
+	});
+
+	// 3.6 Chuyển mật khẩu thành md5
+	req.body.password = md5(req.body.password);
+	// 3.7 ghi tất cả thông tin xuống db
+	db.get('users').push(req.body).write();
+
+	// 3.8 set cho nó một cái cookie và có signed
+	// 4. redirect sang trang user
+	
+	res.redirect('/auth/active');
+
+
+}
