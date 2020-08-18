@@ -72,8 +72,13 @@ module.exports.postCreate = function(req, res, next) {
 module.exports.signout = function(req, res) {
 
 	res.clearCookie('userID');
+<<<<<<< HEAD
 
 	res.redirect('/');
 }
 
+=======
+>>>>>>> 9cc27510e7b4046bf76d9815ea87875cf45e4904
 
+	res.redirect('/');
+}
