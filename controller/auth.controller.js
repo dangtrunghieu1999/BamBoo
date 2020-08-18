@@ -37,9 +37,11 @@ module.exports.active = function(req, res) {
 	res.render('auth/active');
 };
 
-//post login
+
+
+// post login
 module.exports.postLogin = function(req, res) {
-	// Lay ra email 
+	// Lay ra email và sdt
 	let email = req.body.email;
 	let password = req.body.password;
 
@@ -52,6 +54,7 @@ module.exports.postLogin = function(req, res) {
 			errors: ['User does not exist.'],
 			values: req.body
 		})
+		// render: path, object
 
 		return;
 	}
@@ -62,7 +65,7 @@ module.exports.postLogin = function(req, res) {
 
 		return;
 	}
-	
+
 	// Nếu có thì transform password thành md5 và so sánh trong database
 	let hashPassword = md5(password);
 
@@ -72,25 +75,77 @@ module.exports.postLogin = function(req, res) {
 		res.render('auth/login', {
 			errors: ['Wrong password.']
 		})
-		// render: path, object
+
 		return;
 	}
-	
+
 	// Nếu okie, thì set cho nó một cái cookie và có signed, redirect sang trang user
 	res.cookie('userID', user.id, {signed: true});
 	res.redirect('/user');
+
+}
+
+// post sign up
+module.exports.postSignup = function(req, res) {
+
+	/**
+	 * 1. Nếu email đã tồn tại thì thông báo lỗi
+	 * 2. Nếu email chưa tồn tại
+	 * 	2.1. Gắn cho nó một cái id
+	 *  2.2. Đổi mật khẩu thành md5
+	 *  2.3. Đăng nhập nó
+	 *  2.4. Riderect tới trang chủ
+	 */
+
+	 //req.body.email: dữ liệu email từ form nhập lên
+
+	// Kiểm tra email có trong db không?
+	let user = db.get('users').find({email: req.body.email}).value();
+
+	// Nếu có thì hiển thị lỗi và return
+	if(user) {
+		res.render('auth/signup', {
+			errors: ['User already exists.'],
+			values: req.body
+		})
+
+		return;
+	}
+
+	// Gán cho nó một cái id
+	req.body.id = shortid.generate();
+	req.body.active = 0;
+
+	var mailOptions = {
+		to: req.body.email,
+		subject: 'Code to active account',
+		text: req.body.id
+	};
+
+	transporter.sendMail(mailOptions, function(error, info){
+		if (error) {
+			console.log(error);
+		} else {
+			console.log('Email sent: ' + info.response);
+		}
+	});
+
+	// Chuyển mật khẩu thành md5
+	// Dùng md5 để mã hóa mật khẩu khi đưa vào db
+	req.body.password = md5(req.body.password);
+
+
+
+	db.get('users').push(req.body).write();
+
+	// Nếu okie, thì set cho nó một cái cookie và có signed, redirect sang trang user
+
+	res.redirect('/auth/active');
 
 
 }
 
 // post forget password
-
-//signup, render forget password
-module.exports.forgetPw = function(req, res) {
-	res.render('auth/forgetpw');
-};
-
-// post forget pw
 module.exports.postForgetPw = function(req, res) {
 
 	/**
@@ -181,56 +236,6 @@ module.exports.postActive = function(req, res) {
 
 	
 };
-module.exports.postSignup = function(req, res) {
-
-	/**
-	 * 1. Nếu email đã tồn tại thì thông báo lỗi
-	 * 2. Nếu email chưa tồn tại
-	 * 	2.1. Gắn cho nó một cái id
-	 *  2.2. Đổi mật khẩu thành md5
-	 *  2.3. Đăng nhập nó
-	 *  2.4. Riderect tới trang chủ
-	 */
-
-	// Kiểm tra email có trong db không?
-	let user = db.get('users').find({email: req.body.email}).value();
-
-	// Nếu có thì hiển thị lỗi và return
-	if(user) {
-		res.render('auth/signup', {
-			errors: ['User already exists.'],
-			values: req.body
-		})
-
-		return;
-	}
-
-	// Gán cho nó một cái id
-	req.body.id = shortid.generate();
-	req.body.active = 0;
-
-	var mailOptions = {
-		to: req.body.email,
-		subject: 'Code to active account',
-		text: req.body.id
-	};
-
-	transporter.sendMail(mailOptions, function(error, info){
-		if (error) {
-			console.log(error);
-		} else {
-			console.log('Email sent: ' + info.response);
-		}
-	});
-
-	// Chuyển mật khẩu thành md5
-	req.body.password = md5(req.body.password);
-
-	db.get('users').push(req.body).write();
-
-	// Nếu okie, thì set cho nó một cái cookie và có signed, redirect sang trang user
-
-	res.redirect('/auth/active');
 
 
-}
+

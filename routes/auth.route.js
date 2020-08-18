@@ -20,3 +20,7 @@ router.get('/active', controller.active);
 
 router.post('/active', controller.postActive);
 
+
+
+
+module.exports = router; 

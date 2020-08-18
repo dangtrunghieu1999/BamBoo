@@ -1,4 +1,5 @@
 const db = require('../db');
+
 module.exports.requireAuth = function(req, res, next) {
 
 // Lấy ra cookie khi đã signedCookie

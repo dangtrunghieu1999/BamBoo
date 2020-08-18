@@ -1,23 +1,522 @@
-
-extends ../layouts/common
-
-block content
-	h1 User
-
-	a(href = "/user/create", class = "btn btn-primary btn-new") New
-
-	form(action = "/user/search", method = "GET" class="d-flex")
-		input(type="text" name = "q" class = "form-control")
-		button(class ="btn btn-primary ml-2") Search
-
-	table.table
-		tr
-			th Name
-			th Phone
-			th Actions
-		each user in users
-			tr
-				td= user.name
-				td= user.phone
-				td
-					a.btn.btn-primary(href='/user/' + user.id) View
+doctype html
+head
+  meta(charset='UTF-8')
+  meta(name='viewport', content='width=device-width, initial-scale=1.0')
+  link(rel='stylesheet', href='./resource/css/base.css')
+  link(rel='stylesheet', href='./resource/css/main.css')
+  link(rel='stylesheet', href='./resource/css/responsive.css')
+  link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css')
+  link(rel='stylesheet', href='./resource/css/grid.css')
+  title Trang chủ
+// BEM - Block Element Modifier
+.app
+  header.header
+    .grid.wide
+      nav.header__navbar.hide-on-mobile-tablet
+        ul.header__navbar-list
+          li.header__navbar-item.header__navbar-item--qr.header__navbar-item--separate
+            a.header__navbar-item-link(href='#') V&agrave;o c&#x1EED;a h&agrave;ng tr&ecirc;n &#x1EE9;ng d&#x1EE5;ng BamBoo
+            .header__qr
+              img.header__qr-img(src='./resource/img/qrcode.png', alt='')
+              .header__app-link
+                a(href='')
+                  img(src='./resource/img/googleplay.png', alt='')
+                a(href='')
+                  img(src='./resource/img/appstore.png', alt='')
+          li.header__navbar-item
+            span K&#x1EBF;t n&#x1ED1;i
+            a(href='#')
+              i.zmdi.zmdi-facebook-box
+            a(href='#')
+              i.zmdi.zmdi-twitter-box
+        ul.header__navbar-list
+          li.header__navbar-item.header__navbar-item--notifi
+            a(href='#')
+              i.zmdi.zmdi-globe
+            a.header__navbar-item-link(href='#') Th&ocirc;ng b&aacute;o
+            .header__notifi
+              header.header__notifi-header
+                h3 Th&ocirc;ng b&aacute;o m&#x1EDB;i nh&#x1EAD;n
+              ul.header__notifi-list
+                li.header__notifi-item
+                  a.header__notifi-link(href='#')
+                    img.header__notifi-img(src='https://cf.shopee.vn/file/908fb70aa7871fd13ea724f53fdb1a77_tn', alt='')
+                    .header__notifi-info
+                      span.header__notifi-name M&#x1EF9; ph&#x1EA9;m Ohui ch&iacute;nh h&atilde;ng
+                      span.header__notifi-des M&ocirc; t&#x1EA3; ohui ch&iacute;nh h&atilde;ng
+                li.header__notifi-item.header__notifi-item--viewed
+                  a.header__notifi-link(href='#')
+                    img.header__notifi-img(src='https://cf.shopee.vn/file/908fb70aa7871fd13ea724f53fdb1a77_tn', alt='')
+                    .header__notifi-info
+                      span.header__notifi-name M&#x1EF9; ph&#x1EA9;m Ohui ch&iacute;nh h&atilde;ng
+                      span.header__notifi-des M&ocirc; t&#x1EA3; ohui ch&iacute;nh h&atilde;ng
+                li.header__notifi-item
+                  a.header__notifi-link(href='#')
+                    img.header__notifi-img(src='https://cf.shopee.vn/file/908fb70aa7871fd13ea724f53fdb1a77_tn', alt='')
+                    .header__notifi-info
+                      span.header__notifi-name M&#x1EF9; ph&#x1EA9;m Ohui ch&iacute;nh h&atilde;ng
+                      span.header__notifi-des M&ocirc; t&#x1EA3; ohui ch&iacute;nh h&atilde;ng
+              .header__notify-footer
+                a(href='#') Xem t&#x1EA5;t c&#x1EA3;
+          li.header__navbar-item
+            a(href='#')
+              i.zmdi.zmdi-pin-help
+            a.header__navbar-item-link(href='#') Tr&#x1EE3; gi&uacute;p
+          // Đăng kí, đăng nhập
+          //
+            <li class="header__navbar-item header__navbar-item--separate">
+            <a href="#" class="header__navbar-item-link register"
+            >Đăng kí</a
+            >
+            </li>
+            <li class="header__navbar-item">
+            <a href="#" class="header__navbar-item-link log-in"
+            >Đăng nhập</a
+            >
+            </li>
+          li.header__navbar-item.header__navbar-user
+            img.header__navbar-user-img(src='./resource/img/cat-avatar.jpg', alt='')
+            span.header__navbar-user-name= user.fullname
+            ul.header__navbar-user-menu
+              li.header__navbar-user-item
+                a(href='#') T&agrave;i kho&#x1EA3;n c&#x1EE7;a t&ocirc;i
+              li.header__navbar-user-item
+                a(href='#') &Dstrok;&#x1ECB;a ch&#x1EC9; c&#x1EE7;a t&ocirc;i
+              li.header__navbar-user-item
+                a(href='#') &Dstrok;&#x1A1;n mua
+              li.header__navbar-user-item.header__navbar-user-item--separate
+                a(href='./user/signout') &Dstrok;&abreve;ng xu&#x1EA5;t
+      // Header with search
+      .header-with-search
+        label.header__mobile-search(for='mobile-search-checkbox')
+          i.header__mobile-search-icon.zmdi.zmdi-search
+        .header__logo.hide-on-tablet
+          a.header__logo-link(href='')
+            svg.header__logo-img(viewbox='0 0 192 65')
+        input#mobile-search-checkbox.header__search-checkbox(type='checkbox', hidden='')
+        .header__search
+          .header__search-input-wrap
+            input.header__search-input(type='text', placeholder='Tìm kiếm sản phẩm')
+            // Search History
+            .header__search-history
+              h3.header__search-history-heading L&#x1ECB;ch s&#x1EED; t&igrave;m ki&#x1EBF;m
+              ul.header__search-history-list
+                li.header__search-history-list-item
+                  a(href='#') Kem d&#x1B0;&#x1EE1;ng da
+                li.header__search-history-list-item
+                  a(href='#') Kem tr&#x1ECB; m&#x1EE5;n
+          .header__search-select
+            span.header__search-select-label
+              | Trong shop
+            i.header__search-select-icon.zmdi.zmdi-caret-down
+            ul.header__search-option
+              li.header__search-option-item.header__search-option-item--active
+                span Trong shop
+                i.zmdi.zmdi-check
+              li.header__search-option-item
+                span Ngo&agrave;i shop
+                i.zmdi.zmdi-check
+          button.header__search-btn
+            i.header__search-btn-icon.zmdi.zmdi-search
+        // Cart layout
+        .header__cart
+          .header__cart-wrap
+            i.header__cart-icon.zmdi.zmdi-shopping-cart
+            // No cart: header__cart-list--no-cart
+            span.header__cart-notice 3
+            .header__cart-list
+              // No cart
+              img.header__cart-list-img(src='./resource/img/no-cart.svg', alt='')
+              span.header__cart-list-no-cart--msg
+                | Ch&#x1B0;a c&oacute; s&#x1EA3;n ph&#x1EA9;m
+              // Has cart
+              h3.header__cart-heading S&#x1EA3;n ph&#x1EA9;m &dstrok;&atilde; th&ecirc;m
+              ul.header__list-list-item
+                // Cart item
+                li.header__cart-item
+                  img.header__cart-img(src='https://cf.shopee.vn/file/908fb70aa7871fd13ea724f53fdb1a77_tn', alt='')
+                  .header__cart-item-info
+                    .header__cart-item-head
+                      h5.header__cart-item-name B&#x1ED9; kem &dstrok;&#x1EB7;t tr&#x1ECB; v&ugrave;ng m&#x1EAF;t
+                      .header__cart-item-price-wrap
+                        span.header__cart-item-price 2.000.000&dstrok;
+                        span.header__cart-item-multiply x
+                        span.header__cart-item-qnt 2
+                    .header__cart-item-body
+                      span.header__cart-item-description
+                        | Ph&acirc;n lo&#x1EA1;i h&agrave;ng: B&#x1EA1;c
+                      span.header__cart-item-remove X&oacute;a
+                li.header__cart-item
+                  img.header__cart-img(src='https://cf.shopee.vn/file/908fb70aa7871fd13ea724f53fdb1a77_tn', alt='')
+                  .header__cart-item-info
+                    .header__cart-item-head
+                      h5.header__cart-item-name B&#x1ED9; kem &dstrok;&#x1EB7;t tr&#x1ECB; v&ugrave;ng m&#x1EAF;t
+                      .header__cart-item-price-wrap
+                        span.header__cart-item-price 2.000.000&dstrok;
+                        span.header__cart-item-multiply x
+                        span.header__cart-item-qnt 2
+                    .header__cart-item-body
+                      span.header__cart-item-description
+                        | Ph&acirc;n lo&#x1EA1;i h&agrave;ng: B&#x1EA1;c
+                      span.header__cart-item-remove X&oacute;a
+                li.header__cart-item
+                  img.header__cart-img(src='https://cf.shopee.vn/file/908fb70aa7871fd13ea724f53fdb1a77_tn', alt='')
+                  .header__cart-item-info
+                    .header__cart-item-head
+                      h5.header__cart-item-name B&#x1ED9; kem &dstrok;&#x1EB7;t tr&#x1ECB; v&ugrave;ng m&#x1EAF;t
+                      .header__cart-item-price-wrap
+                        span.header__cart-item-price 2.000.000&dstrok;
+                        span.header__cart-item-multiply x
+                        span.header__cart-item-qnt 2
+                    .header__cart-item-body
+                      span.header__cart-item-description
+                        | Ph&acirc;n lo&#x1EA1;i h&agrave;ng: B&#x1EA1;c
+                      span.header__cart-item-remove X&oacute;a
+                li.header__cart-item
+                  img.header__cart-img(src='https://cf.shopee.vn/file/908fb70aa7871fd13ea724f53fdb1a77_tn', alt='')
+                  .header__cart-item-info
+                    .header__cart-item-head
+                      h5.header__cart-item-name B&#x1ED9; kem &dstrok;&#x1EB7;t tr&#x1ECB; v&ugrave;ng m&#x1EAF;t
+                      .header__cart-item-price-wrap
+                        span.header__cart-item-price 2.000.000&dstrok;
+                        span.header__cart-item-multiply x
+                        span.header__cart-item-qnt 2
+                    .header__cart-item-body
+                      span.header__cart-item-description
+                        | Ph&acirc;n lo&#x1EA1;i h&agrave;ng: B&#x1EA1;c
+                      span.header__cart-item-remove X&oacute;a
+                li.header__cart-item
+                  img.header__cart-img(src='https://cf.shopee.vn/file/908fb70aa7871fd13ea724f53fdb1a77_tn', alt='')
+                  .header__cart-item-info
+                    .header__cart-item-head
+                      h5.header__cart-item-name B&#x1ED9; kem &dstrok;&#x1EB7;t tr&#x1ECB; v&ugrave;ng m&#x1EAF;t
+                      .header__cart-item-price-wrap
+                        span.header__cart-item-price 2.000.000&dstrok;
+                        span.header__cart-item-multiply x
+                        span.header__cart-item-qnt 2
+                    .header__cart-item-body
+                      span.header__cart-item-description
+                        | Ph&acirc;n lo&#x1EA1;i h&agrave;ng: B&#x1EA1;c
+                      span.header__cart-item-remove X&oacute;a
+                li.header__cart-item
+                  img.header__cart-img(src='https://cf.shopee.vn/file/908fb70aa7871fd13ea724f53fdb1a77_tn', alt='')
+                  .header__cart-item-info
+                    .header__cart-item-head
+                      h5.header__cart-item-name B&#x1ED9; kem &dstrok;&#x1EB7;t tr&#x1ECB; v&ugrave;ng m&#x1EAF;t
+                      .header__cart-item-price-wrap
+                        span.header__cart-item-price 2.000.000&dstrok;
+                        span.header__cart-item-multiply x
+                        span.header__cart-item-qnt 2
+                    .header__cart-item-body
+                      span.header__cart-item-description
+                        | Ph&acirc;n lo&#x1EA1;i h&agrave;ng: B&#x1EA1;c
+                      span.header__cart-item-remove X&oacute;a
+                li.header__cart-item
+                  img.header__cart-img(src='https://cf.shopee.vn/file/908fb70aa7871fd13ea724f53fdb1a77_tn', alt='')
+                  .header__cart-item-info
+                    .header__cart-item-head
+                      h5.header__cart-item-name B&#x1ED9; kem &dstrok;&#x1EB7;t tr&#x1ECB; v&ugrave;ng m&#x1EAF;t
+                      .header__cart-item-price-wrap
+                        span.header__cart-item-price 2.000.000&dstrok;
+                        span.header__cart-item-multiply x
+                        span.header__cart-item-qnt 2
+                    .header__cart-item-body
+                      span.header__cart-item-description
+                        | Ph&acirc;n lo&#x1EA1;i h&agrave;ng: B&#x1EA1;c
+                      span.header__cart-item-remove X&oacute;a
+                li.header__cart-item
+                  img.header__cart-img(src='https://cf.shopee.vn/file/908fb70aa7871fd13ea724f53fdb1a77_tn', alt='')
+                  .header__cart-item-info
+                    .header__cart-item-head
+                      h5.header__cart-item-name B&#x1ED9; kem &dstrok;&#x1EB7;t tr&#x1ECB; v&ugrave;ng m&#x1EAF;t
+                      .header__cart-item-price-wrap
+                        span.header__cart-item-price 2.000.000&dstrok;
+                        span.header__cart-item-multiply x
+                        span.header__cart-item-qnt 2
+                    .header__cart-item-body
+                      span.header__cart-item-description
+                        | Ph&acirc;n lo&#x1EA1;i h&agrave;ng: B&#x1EA1;c
+                      span.header__cart-item-remove X&oacute;a
+              a.btn.btn--primary.header__cart-view-cart Xem gi&#x1ECF; h&agrave;ng
+    ul.header__sort-bar
+      li.header__sort-item
+        a.header__sort-link(href='#') Li&ecirc;n quan
+      li.header__sort-item
+        a.header__sort-link.header__sort-link--active(href='#') M&#x1EDB;i nh&#x1EA5;t
+      li.header__sort-item
+        a.header__sort-link(href='#') B&aacute;n ch&#x1EA1;y
+      li.header__sort-item
+        a.header__sort-link(href='#') Gi&aacute;
+  .app_container
+    .grid.wide
+      .row.sm-gutter.app__content
+        .col.l-2.m-0.c-0
+          nav.category
+            h3.category__heading
+              i.category__heading-icon.zmdi.zmdi-view-list
+              |                 Danh m&#x1EE5;c
+            ul.category-list
+              li.category-item.category-item--active
+                a.category-item__link(href='#')
+                  | Áo thun nhập khẩu
+              li.category-item
+                a.category-item__link(href='#')
+                  | Áo nam đẹp, rẻ
+              li.category-item
+                a.category-item__link(href='#')
+                  | Áo khoác giá tốt
+        .col.l-10.m-12.c-12
+          .home-filter.hide-on-mobile-tablet
+            span.home-filter__lable S&#x1EAF;p x&#x1EBF;p theo
+            button.btn.home-filter__btn Ph&#x1ED5; bi&#x1EBF;n
+            button.btn.btn--primary.home-filter__btn M&#x1EDB;i nh&#x1EA5;t
+            button.btn.home-filter__btn B&aacute;n ch&#x1EA1;y
+            .select-input
+              span.select-input__label Gi&aacute;
+              i.zmdi.zmdi-caret-down
+              ul.select-input__list
+                li.select-input__item
+                  a(href='#') Gi&aacute; th&#x1EA5;p &dstrok;&#x1EBF;n cao
+                li.select-input__item
+                  a(href='#') Gi&aacute; cao &dstrok;&#x1EBF;n th&#x1EA5;p
+            .home-filter__page
+              span.home-filter__page-num
+                span.home-filter__page-currrent 1
+                | /14
+              .home-filter__page-control
+                a.home-filter__page-btn.home-filter__page-btn--disabled(href='')
+                  i.zmdi.zmdi-caret-left
+                a.home-filter__page-btn(href='')
+                  i.zmdi.zmdi-caret-right
+          .home-product
+            .row.sm-gutter
+              each product in products
+                .col.l-2-4.m-4.c-6
+                  a.home-product-item(href='#')
+                    .home-product-item__img(style="background-image: url('https://cf.shopee.vn/file/957dc96714d51b4d6c2b80392034e479');")
+                    h4.home-product-item__name= product.desciption   
+                    .home-product-item__price
+                      span.home-product-item__price-old 1.200.00&dstrok;
+                      span.home-product-item__price-current 999.000&dstrok;
+                    .home-product-item__action
+                      span.home-product-item__like
+                        i.zmdi.zmdi-android
+                      .home-product-item__rating
+                        i.home-product-item__rating-star-gold.zmdi.zmdi-star
+                        i.home-product-item__rating-star-gold.zmdi.zmdi-star
+                        i.home-product-item__rating-star-gold.zmdi.zmdi-star
+                        i.home-product-item__rating-star-gold.zmdi.zmdi-star
+                        i.zmdi.zmdi-star
+                      span.home-product-item__sold 88 &dstrok;&atilde; b&aacute;n
+                    .home-product-item__origin
+                      span.home-product-item__brand topdynamic
+                      span.home-product-item__origin-name Vi&#x1EC7;t Nam
+                    .home-product-item__favourite
+                      i.zmdi.zmdi-check
+                      span Y&ecirc;u th&iacute;ch
+                    .home-product-item__sale-off
+                      span.home-product-item__sale-off-percent 10%
+                      span.home-product-item__sale-off-label GI&#x1EA2;M
+          ul.pagination.home-product__pagination
+            li.pagination-item
+              a.pagination-item__link(href='')
+                i.pagination-item__icon.zmdi.zmdi-chevron-left
+            li.pagination-item.pagination-item--active
+              a.pagination-item__link(href='?page2')
+                | 1
+            li.pagination-item
+              a.pagination-item__link(href='')
+                | 2
+            li.pagination-item
+              a.pagination-item__link(href='')
+                | 3
+            li.pagination-item
+              a.pagination-item__link(href='')
+                | 4
+            li.pagination-item
+              a.pagination-item__link(href='')
+                | 5
+            li.pagination-item
+              a.pagination-item__link(href='')
+                | ...
+            li.pagination-item
+              a.pagination-item__link(href='')
+                | 14
+            li.pagination-item
+              a.pagination-item__link(href='')
+                i.pagination-item__icon.zmdi.zmdi-chevron-right
+  footer.footer
+    .grid.wide
+      .row.sm-gutter
+        .col.l-2-4.m-4.c-6
+          h3.footer__heading Ch&abreve;m s&oacute;c kh&aacute;ch h&agrave;ng
+          ul.footer__list
+            li.footer__item
+              a.footer-item-link(href='') Trung t&acirc;m h&#x1ED7; tr&#x1EE3;
+            li.footer__item
+              a.footer-item-link(href='') Trung t&acirc;m b&#x1EA3;o h&agrave;nh
+            li.footer__item
+              a.footer-item-link(href='') Ph&#x1EA3;n h&#x1ED3;i kh&aacute;ch h&agrave;ng
+        .col.l-2-4.m-4.c-6
+          h3.footer__heading Gi&#x1EDB;i thi&#x1EC7;u
+          ul.footer__list
+            li.footer__item
+              a.footer-item-link(href='') Gi&#x1EDB;i thi&#x1EC7;u
+            li.footer__item
+              a.footer-item-link(href='') Tuy&#x1EC3;n d&#x1EE5;ng
+            li.footer__item
+              a.footer-item-link(href='') &Dstrok;i&#x1EC1;u kho&#x1EA3;n
+        .col.l-2-4.m-4.c-6
+          h3.footer__heading Theo d&otilde;i ch&uacute;ng t&ocirc;i
+          ul.footer__list
+            li.footer__item
+              a.footer-item-link(href='')
+                i.zmdi.zmdi-facebook-box.footer-item-link__icon
+                |                   Facebook
+            li.footer__item
+              a.footer-item-link(href='')
+                i.zmdi.zmdi-instagram.footer-item-link__icon
+                |                   Instagram
+            li.footer__item
+              a.footer-item-link(href='')
+                i.zmdi.zmdi-linkedin.footer-item-link__icon
+                |                   Linkedin
+        .col.l-2-4.m-4.c-6
+          h3.footer__heading M&#x1EB7;c h&agrave;ng
+          ul.footer__list
+            li.footer__item
+              a.footer-item-link(href='') &Dstrok;i&#x1EC7;n t&#x1EED;
+            li.footer__item
+              a.footer-item-link(href='') Ph&#x1EE5; ki&#x1EC7;n
+            li.footer__item
+              a.footer-item-link(href='') Qu&#x1EA7;n &aacute;o
+        .col.l-2-4.m-4.c-6
+          h3.footer__heading C&#x1EED;a h&agrave;ng tr&ecirc;n &#x1EE9;ng d&#x1EE5;ng
+          .footer__download
+            img.footer__download-qr(src='./resource/img/qrcode.png', alt='')
+            .footer__download-apps
+              a(href='')
+                img.footer__download-app-img(src='./resource/img/appstore.png', alt='')
+              a(href='')
+                img.footer__download-app-img(src='./resource/img/googleplay.png', alt='')
+.footer__bottom
+  .grid.wide
+    p
+      | Copyright &copy; 2020 by thuongnguyen. All rights reserved.
+// Modal layout
+//
+  <div class="modal">
+  <div class="modal__overlay"></div>
+  <div class="modal__body">
+// Authen form
+// Login form
+//
+  <div class="auth-form">
+  <div class="auth-form__container">
+  <div class="auth-form-header">
+  <h3 class="auth-form__heading">Đăng kí</h3>
+  <span class="auth-form__swich-btn">Đăng nhập</span>
+  </div>
+  <div class="auth-form__form">
+  <div class="auth-form__group">
+  <input
+  type="text"
+  class="auth-form__input"
+  placeholder="Email của bạn"
+  />
+  </div>
+  <div class="auth-form__group">
+  <input
+  type="password"
+  class="auth-form__input"
+  placeholder="Password của bạn"
+  />
+  </div>
+  <div class="auth-form__group">
+  <input
+  type="password"
+  class="auth-form__input"
+  placeholder="Nhập lại password của bạn"
+  />
+  </div>
+  </div>
+  <div class="auth-form__aside">
+  <p class="auth-form__policy-text">
+  Bằng việc đăng kí, bạn đã đồng ý về F8Shop về
+  <a href="#" class="auth-form__text-link"
+  >Điều khoản dịch vụ</a
+  >
+  &
+  <a href="#" class="auth-form__text-link"
+  >Chính sách bảo mật</a
+  >
+  </p>
+  <div class="auth-form__controls">
+  <button class="btn">TRỞ LẠI</button>
+  <button class="btn btn--primary btn--dissable">ĐĂNG KÍ</button>
+  </div>
+  </div>
+  </div>
+  <div class="auth-form__socials">
+  <a href="#" class=" btn--with-icon">
+  <i class="zmdi zmdi-facebook-box fb"></i>
+  <span> Kết nối với Facebook</span>
+  </a>
+  <a href="#" class="btn--with-icon">
+  <i class="zmdi zmdi-google-plus gg"></i>
+  <span>Kết nối với Google</span>
+  </a>
+  </div>
+  </div>
+// Login form
+//
+  <div class="auth-form">
+  <div class="auth-form__container">
+  <div class="auth-form-header">
+  <h3 class="auth-form__heading">Đăng nhập</h3>
+  <span class="auth-form__swich-btn">Đăng kí</span>
+  </div>
+  <div class="auth-form__form">
+  <div class="auth-form__group">
+  <input
+  type="text"
+  class="auth-form__input"
+  placeholder="Email của bạn"
+  />
+  </div>
+  <div class="auth-form__group">
+  <input
+  type="password"
+  class="auth-form__input"
+  placeholder="Password của bạn"
+  />
+  </div>
+  </div>
+  <div class="auth-form__aside">
+  <div class="auth-form__help">
+  <a href="#" class="auth-form__help-link">Quên mật khẩu</a>
+  <span></span>
+  <a href="#" class="auth-form__help-link">Cần trợ giúp?</a>
+  </div>
+  </div>
+  <div class="auth-form__controls">
+  <button class="btn">TRỞ LẠI</button>
+  <button class="btn btn--primary btn--dissable">
+  ĐĂNG NHẬP
+  </button>
+  </div>
+  </div>
+  <div class="auth-form__socials">
+  <a href="#" class="btn--with-icon">
+  <i class="zmdi zmdi-facebook-box fb"></i>
+  <span>Login by Facebook</span>
+  </a>
+  <a href="#" class="btn--with-icon">
+  <i class="zmdi zmdi-google-plus gg"></i>
+  <span>Login by Google</span>
+  </a>
+  </div>
+  </div>
+//
+  </div>
+  </div>
